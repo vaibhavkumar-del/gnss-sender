@@ -33,7 +33,7 @@ const (
 	MAX_PER_FILE = 100                // packets per log file
 
 	BINARY_PATH      = "/data/gnss_sender"
-	UPDATE_CHECK_URL = "https://raw.githubusercontent.com/YOUR_GITHUB_USER/YOUR_REPO/main/version.json"
+	UPDATE_CHECK_URL = "https://raw.githubusercontent.com/vaibhavkumar-del/gnss-sender/main/version.json"
 	UPDATE_INTERVAL  = 30 * time.Minute
 )
 
