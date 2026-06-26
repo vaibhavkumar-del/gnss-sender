@@ -1,0 +1,12 @@
+{
+  "updated": "2026-06-26",
+  "programs": [
+    {
+      "name": "gnss_sender",
+      "version": "v1.0.1",
+      "binary_path": "/data/gnss_sender",
+      "service": "gnss-sender.service",
+      "url": "https://github.com/vaibhavkumar-del/gnss-sender/releases/download/v1.0.1/gnss_sender_arm"
+    }
+  ]
+}
