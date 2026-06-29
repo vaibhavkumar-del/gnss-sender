@@ -2,3 +2,4 @@ gnss_sender_arm
 gnss_sender
 fota_agent_arm
 fota_agent
+.cf_dist/
