@@ -2,12 +2,9 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
-	"io"
 	"math"
 	"net"
-	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -21,7 +18,7 @@ const (
 	DUMP_FILE   = "/tmp/gnss_dump"
 	SERVER_IP   = "104.199.145.69"
 	SERVER_PORT = "10196"
-	IMEI        = "350435030985778"
+	IMEI        = "862174066164069"
 	VEHICLE     = "KA1234"
 	FIRMWARE    = "V1.0.1"
 	GPIO_PATH   = "/sys/class/gpio/gpio42"
@@ -32,68 +29,7 @@ const (
 	QUEUE_DIR    = "/data/gnss_queue" // persistent internal storage
 	MAX_PER_FILE = 100                // packets per log file
 
-	BINARY_PATH      = "/data/gnss_sender"
-	UPDATE_CHECK_URL = "https://raw.githubusercontent.com/vaibhavkumar-del/gnss-sender/main/version.json"
-	UPDATE_INTERVAL  = 30 * time.Minute
 )
-
-type versionInfo struct {
-	Version string `json:"version"`
-	URL     string `json:"url"`
-}
-
-func checkForUpdate() {
-	client := &http.Client{Timeout: 15 * time.Second}
-
-	resp, err := client.Get(UPDATE_CHECK_URL)
-	if err != nil {
-		fmt.Printf("[UPDATE] Version check failed: %v\n", err)
-		return
-	}
-	defer resp.Body.Close()
-
-	var info versionInfo
-	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
-		fmt.Printf("[UPDATE] Bad version.json: %v\n", err)
-		return
-	}
-
-	if info.Version == FIRMWARE {
-		fmt.Printf("[UPDATE] Already on latest (%s)\n", FIRMWARE)
-		return
-	}
-
-	fmt.Printf("[UPDATE] New version %s available (current %s), downloading...\n", info.Version, FIRMWARE)
-
-	resp2, err := client.Get(info.URL)
-	if err != nil {
-		fmt.Printf("[UPDATE] Download failed: %v\n", err)
-		return
-	}
-	defer resp2.Body.Close()
-
-	tmpPath := BINARY_PATH + ".new"
-	f, err := os.OpenFile(tmpPath, os.O_CREATE|os.O_WRONLY|os.O_TRUNC, 0755)
-	if err != nil {
-		fmt.Printf("[UPDATE] Cannot write temp file: %v\n", err)
-		return
-	}
-	if _, err := io.Copy(f, resp2.Body); err != nil {
-		f.Close()
-		os.Remove(tmpPath)
-		fmt.Printf("[UPDATE] Write failed: %v\n", err)
-		return
-	}
-	f.Close()
-
-	if err := os.Rename(tmpPath, BINARY_PATH); err != nil {
-		fmt.Printf("[UPDATE] Replace failed: %v\n", err)
-		return
-	}
-
-	fmt.Println("[UPDATE] Update applied — exiting for restart")
-	os.Exit(0) // systemd Restart=always will launch the new binary
-}
 
 // ── GPIO / LED ────────────────────────────────────────────────────────────────
 
@@ -506,9 +442,6 @@ func main() {
 	time.Sleep(30 * time.Second)
 	fmt.Println("[*] Starting GPS loop")
 
-	checkForUpdate()
-	lastUpdateCheck := time.Now()
-
 	for {
 		select {
 		case <-sig:
@@ -516,11 +449,6 @@ func main() {
 			gpioWrite(GPIO_PATH+"/value", "0")
 			os.Exit(0)
 		default:
-		}
-
-		if time.Since(lastUpdateCheck) >= UPDATE_INTERVAL {
-			checkForUpdate()
-			lastUpdateCheck = time.Now()
 		}
 
 		fmt.Println("[*] Reading GNSS...")

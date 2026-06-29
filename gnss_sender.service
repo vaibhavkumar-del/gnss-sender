@@ -1,0 +1,13 @@
+[Unit]
+Description=GNSS Sender
+After=network.target cav_initscript.service
+
+[Service]
+ExecStart=/data/gnss_sender
+Restart=always
+RestartSec=5
+StandardOutput=append:/data/gnss_sender.log
+StandardError=append:/data/gnss_sender.log
+
+[Install]
+WantedBy=multi-user.target

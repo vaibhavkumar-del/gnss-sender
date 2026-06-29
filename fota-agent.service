@@ -1,0 +1,14 @@
+[Unit]
+Description=Central FOTA Agent
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/data/fota_agent
+Restart=always
+RestartSec=60
+StandardOutput=append:/data/fota_agent.log
+StandardError=append:/data/fota_agent.log
+
+[Install]
+WantedBy=multi-user.target
