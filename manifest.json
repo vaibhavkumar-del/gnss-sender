@@ -6,7 +6,7 @@
       "version": "v1.0.1",
       "binary_path": "/data/gnss_sender",
       "service": "gnss-sender.service",
-      "url": "https://gnss-fota.vaibhavkumar.workers.dev/gnss_sender_arm"
+      "url": "https://raw.githubusercontent.com/vaibhavkumar-del/gnss-sender/main/gnss_sender_arm"
     }
   ]
 }

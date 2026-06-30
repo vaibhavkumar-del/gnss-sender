@@ -43,7 +43,7 @@ Write-Host "      Built OK ($size MB)"
 
 # 4. Git commit, tag, push
 Write-Host "`n[4/6] Git commit + tag $Version + push..." -ForegroundColor Yellow
-git -C $Root add main.go manifest.json
+git -C $Root add main.go manifest.json gnss_sender_arm
 git -C $Root commit -m "release: $Version"
 git -C $Root tag $Version
 git -C $Root push origin main

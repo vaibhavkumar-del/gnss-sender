@@ -1,9 +1,12 @@
 package main
 
 import (
+	"context"
+	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
@@ -12,7 +15,9 @@ import (
 )
 
 const (
-	MANIFEST_URL     = "https://gnss-fota.vaibhavkumar.workers.dev/manifest.json"
+	MANIFEST_URL     = "https://raw.githubusercontent.com/vaibhavkumar-del/gnss-sender/main/manifest.json"
+	GH_RAW_HOST      = "raw.githubusercontent.com"
+	GH_RAW_IP        = "185.199.108.133" // GitHub CDN — whitelisted by Airtel, stable /22 range
 	CHECK_INTERVAL   = 30 * time.Minute
 	NAND_MOUNT       = "/data/nand"
 	NAND_VER_DIR     = "/data/nand/fota"
@@ -172,7 +177,28 @@ func main() {
 	fmt.Printf("[FOTA] Manifest URL: %s\n", MANIFEST_URL)
 	fmt.Printf("[FOTA] Check interval: %s\n", CHECK_INTERVAL)
 
-	client := &http.Client{Timeout: 30 * time.Second}
+	// Connect to GitHub CDN IP directly with no SNI in the TLS ClientHello.
+	// Carrier DPI filters by SNI; omitting it (ServerName="") bypasses the filter.
+	// GitHub's TLS stack serves a default cert which we skip-verify.
+	client := &http.Client{
+		Timeout: 30 * time.Second,
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				InsecureSkipVerify: true,
+				ServerName:         "", // no SNI — carrier cannot filter what it cannot see
+			},
+			DialContext: func(ctx context.Context, network, addr string) (net.Conn, error) {
+				host, _, err := net.SplitHostPort(addr)
+				if err != nil {
+					return nil, err
+				}
+				if host == GH_RAW_HOST {
+					addr = GH_RAW_IP + ":443"
+				}
+				return (&net.Dialer{Timeout: 30 * time.Second}).DialContext(ctx, network, addr)
+			},
+		},
+	}
 
 	checkAndUpdate(client)
 
