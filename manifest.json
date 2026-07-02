@@ -1,13 +1,12 @@
-
 {
-  "updated": "2026-06-26",
-  "programs": [
-    {
-      "name": "gnss_sender",
-      "version": "v1.0.1",
-      "binary_path": "/data/gnss_sender",
-      "service": "gnss-sender.service",
-      "url": "https://intellicar-fota.pages.dev/gnss_sender_arm"
-    }
-  ]
+    "updated":  "2026-07-02",
+    "programs":  [
+                     {
+                         "name":  "gnss_sender",
+                         "version":  "v1.0.2",
+                         "binary_path":  "/data/gnss_sender",
+                         "service":  "gnss-sender.service",
+                         "url":  "https://hw2.buzzenergy.in:10004/gnss_sender_arm"
+                     }
+                 ]
 }

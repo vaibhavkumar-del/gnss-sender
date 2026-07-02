@@ -20,7 +20,7 @@ const (
 	SERVER_PORT = "10196"
 	IMEI        = "862174066164069"
 	VEHICLE     = "KA1234"
-	FIRMWARE    = "V1.0.1"
+	FIRMWARE    = "V1.0.2"
 	GPIO_PATH   = "/sys/class/gpio/gpio42"
 	GPIO_EXPORT = "/sys/class/gpio/export"
 	BLINK_COUNT = 3
